@@ -1,17 +1,20 @@
 use rmenu::prelude::*;
-use rmenu::set_window_properties;
 fn main() {
     let (conn, screen_num) = x11rb::connect(None).unwrap();
-
     let win = conn.generate_id().unwrap();
     let screen = &conn.setup().roots[screen_num];
 
+    let gc_id = conn.generate_id().unwrap();
+
     let window = Window::builder(win, &screen);
 
+    let values = CreateGCAux::default().foreground(screen.black_pixel);
     set_window_properties(&conn, &window, &screen);
 
-    conn.map_window(window.get_id()).unwrap();
-    conn.flush().unwrap();
+    conn.create_gc(gc_id, window.id, &values).unwrap();
 
-    std::thread::sleep(std::time::Duration::from_secs(5));
+    conn.map_window(window.id).unwrap();
+    conn.flush().unwrap();
+    handle_event_loop(&conn, window.id, gc_id).unwrap();
 }
+
