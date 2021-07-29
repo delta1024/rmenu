@@ -9,4 +9,4 @@ pub use x11rb::protocol::xproto::Window as X11Window;
 pub use x11rb::protocol::xproto::*;
 pub use x11rb::protocol::Event;
 pub use x11rb::wrapper::ConnectionExt as _;
-pub type RmenuResult = Result<(), Box<dyn Error>>;
+pub type RmenuResult<T> = Result<T, Box<dyn Error>>;

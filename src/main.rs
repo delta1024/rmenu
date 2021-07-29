@@ -15,6 +15,6 @@ fn main() {
 
     conn.map_window(window.id).unwrap();
     conn.flush().unwrap();
-    handle_event_loop(&conn, window.id, gc_id).unwrap();
+    handle_event_loop(&conn, window.id, gc_id, &screen).unwrap();
 }
 

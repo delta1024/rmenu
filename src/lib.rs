@@ -3,7 +3,7 @@ rmenu is a one to one rewrite of dmenu in rust for use with redwm with out looki
 # Basic Data Flow
 * Read from stdin into a vector (maybe hashtable)
 * for each line create a assosiated context to be drawn within the bar
-* the prompt is drawn, as the user types the list is narrowed down to matche
+* the prompt is drawn, as the user types the list is narrowed down to matche (use fuzzy sort for this)
 * when the user sellects an option it's string is returned to stdout
 
 # Main
@@ -44,6 +44,9 @@ use std::io::{self, BufRead};
 */
 use x11rb::COPY_DEPTH_FROM_PARENT;
 pub const HEIGHT: u16 = 22;
+// pub const USER_FONT: &str = "-adobe-times-medium-i-normal--8-80-75-75-p-42-iso10646-1";
+pub const USER_FONT: &str = "lucidasanstypewriter-12";
+pub const FONT_SIZE: usize = 12;
 const TITLE: &str = "rmenu";
 
 pub mod prelude;
@@ -115,7 +118,7 @@ pub fn set_values(screen: &Screen) -> CreateWindowAux {
 /** Sets the window properties (see [`Window`] for more configuration options)
 ```
 # use rmenu::prelude::*;
-# fn main() -> Result<(), Box<dyn std::error::Error>> {
+# fn main() -> RmenuResult {
     use rmenu::set_window_properties;
 
     let (conn, screen_num) = x11rb::connect(None)?;
