@@ -1,14 +1,7 @@
 use rmenu::prelude::*;
-use rmenu::{get_user_args, get_user_in};
+use rmenu::get_user_in;
 fn main() {
-    let input = {
-        let input = get_user_args().unwrap();
-
-        match input {
-            Some(im) => im,
-            None => get_user_in().unwrap(),
-        }
-    };
+    let input = get_user_in().unwrap();
 
     let (conn, screen_num) = x11rb::connect(None).unwrap();
     let win = conn.generate_id().unwrap();

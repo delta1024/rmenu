@@ -51,14 +51,6 @@ pub fn get_user_in() -> RmenuResult<Vec<String>> {
     Ok(bug)
 }
 
-pub fn get_user_args() -> RmenuResult<Option<Vec<String>>> {
-    Ok(Some(vec![
-        String::from("Not"),
-        String::from("Yet"),
-        String::from("Implemented"),
-    ]))
-}
-
 #[derive(Default)]
 /// Contains the window metadata
 pub struct Window {
