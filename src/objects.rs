@@ -2,7 +2,82 @@
 use crate::prelude::*;
 use crate::FONT_SIZE;
 use crate::HEIGHT;
-use x11rb::rust_connection::ReplyOrIdError;
+/// Holds information about text location and context
+#[derive(Debug, Clone, Default, Copy)]
+pub struct TextBox<'a> {
+    text: &'a str,
+    x1: i16,
+    /// The end point for the text box
+    pub x2: i16,
+    y: i16,
+    context: Gcontext,
+}
+
+impl<'a> TextBox<'a> {
+    pub fn new(text: &'a str) -> Self {
+        TextBox {
+            text,
+            ..TextBox::default()
+        }
+    }
+
+    /// Sets the [`Gcontext`] value for the [`TextBox`].
+    /// TODO: extract values to it's own function/section.
+    pub fn set_gc<C>(
+        &mut self,
+        conn: &C,
+        screen: &Screen,
+        window: X11Window,
+        font_name: &str,
+    ) -> RmenuResult<&mut Self>
+    where
+        C: Connection + RequestConnection,
+    {
+        let font = conn.generate_id()?;
+
+        conn.open_font(font, font_name.as_bytes())?;
+
+        let gc = conn.generate_id()?;
+
+        let values = CreateGCAux::default()
+            .foreground(screen.black_pixel)
+            .background(screen.white_pixel)
+            .font(font);
+        conn.create_gc(gc, window, &values)?;
+
+        conn.close_font(font)?;
+        self.context = gc;
+
+        Ok(self)
+    }
+
+    pub fn set_x(&mut self, x: i16) -> &mut Self {
+        self.x1 = x;
+        self.x2 = (self.text.len() * FONT_SIZE) as i16 + self.x1;
+        self
+    }
+    pub fn set_y(&mut self, y: i16) -> &mut Self {
+        self.y = y;
+        self
+    }
+
+    pub fn draw<C>(self, conn: &C, window: X11Window) -> RmenuResult<()>
+    where
+        C: Connection + RequestConnection,
+    {
+        let gc = self.context;
+        let x = self.x1;
+        let y = self.y;
+        let text = self.text;
+
+        conn.image_text8(window, gc, x, y, text.as_bytes())?;
+
+        conn.free_gc(gc)?;
+        Ok(())
+    }
+}
+
+
 pub fn x_in_a_box<C>(conn: &C, win_id: X11Window, gc_id: u32) -> RmenuResult<()>
 where
     C: Connection + RequestConnection,
@@ -25,90 +100,5 @@ where
 
     conn.poly_segment(win_id, gc_id, &segments)?;
     conn.poly_line(CoordMode::ORIGIN, win_id, gc_id, &points)?;
-    conn.flush()?;
     Ok(())
-}
-
-/** Concatonates the given vector on screen
-# Variables
-* `conn`: the `X11` Connection
-* `screen`: the screen
-* `window`: the `X11` window id
-* `x`: x coordanite
-* `y`: y coordanite
-* `labels`: strings to concat
-* `font_name`: font
-*/
-pub fn concat_text<C>(
-    conn: &C,
-    screen: &Screen,
-    window: X11Window,
-    x: i16,
-    y: i16,
-    labels: &Vec<String>,
-    font_name: &str,
-) -> RmenuResult<()>
-where
-    C: Connection + RequestConnection,
-{
-    let mut text = labels.iter();
-    let mut x = x;
-    loop {
-        let label = text.next();
-        let label = match label {
-            Some(string) => string,
-            None => break,
-        };
-
-        x = draw_text(conn, screen, window, x, y, &label, font_name)?;
-    }
-    Ok(())
-}
-/// Draws text and returns the overall width of the box
-fn draw_text<C>(
-    conn: &C,
-    screen: &Screen,
-    window: X11Window,
-    x1: i16,
-    y1: i16,
-    label: &str,
-    font_name: &str,
-) -> RmenuResult<i16>
-where
-    C: Connection + RequestConnection,
-{
-    let gc = gc_font_get(conn, screen, window, font_name)?;
-
-    conn.image_text8(window, gc, x1, y1, label.as_bytes())?;
-
-    conn.free_gc(gc)?;
-    let len = (label.chars().count() * FONT_SIZE) as i16;
-    let len = x1 + len;
-    Ok(len)
-}
-
-fn gc_font_get<C>(
-    conn: &C,
-    screen: &Screen,
-    window: X11Window,
-    font_name: &str,
-) -> Result<Gcontext, ReplyOrIdError>
-where
-    C: Connection + RequestConnection,
-{
-    let font = conn.generate_id()?;
-
-    conn.open_font(font, font_name.as_bytes())?;
-
-    let gc = conn.generate_id()?;
-
-    let values = CreateGCAux::default()
-        .foreground(screen.black_pixel)
-        .background(screen.white_pixel)
-        .font(font);
-    conn.create_gc(gc, window, &values)?;
-
-    conn.close_font(font)?;
-
-    Ok(gc)
 }

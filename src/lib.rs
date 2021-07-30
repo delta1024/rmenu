@@ -14,7 +14,7 @@ rmenu is a one to one rewrite of dmenu in rust for use with redwm with out looki
 use std::io::{self, BufRead};
 use x11rb::COPY_DEPTH_FROM_PARENT;
 pub const HEIGHT: u16 = 22;
-// pub const USER_FONT: &str = "-adobe-times-medium-i-normal--8-80-75-75-p-42-iso10646-1";
+pub const BASELINE: i16 = 17;
 pub const USER_FONT: &str = "lucidasanstypewriter-12";
 pub const FONT_SIZE: usize = 12;
 pub const _TEST_VEC: [&str; 2] = ["Hello", "World"];
@@ -24,7 +24,7 @@ pub mod prelude;
 use crate::prelude::*;
 pub mod events;
 pub mod objects;
-
+use objects::TextBox;
 
 /// Returns lines from stdin as  `Vec<String>`.
 pub fn parse_std_in() -> RmenuResult<Vec<String>> {
@@ -147,4 +147,20 @@ where
         tile.as_bytes(),
     )
     .unwrap();
+}
+
+/** Concatonates the given `Vec<TextBox>` on screen
+# Variables
+* `conn`: the `X11` Connection
+* `window`: the `X11` window id
+* `labels`: [`TextBox `] in a `Vec` to concat
+*/
+pub fn concat_text<C>(conn: &C, window: X11Window, labels: &Vec<TextBox>) -> RmenuResult<()>
+where
+    C: Connection + RequestConnection,
+{
+    for i in labels {
+        &i.draw(conn, window);
+    }
+    Ok(())
 }
