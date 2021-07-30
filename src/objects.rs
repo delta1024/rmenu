@@ -29,7 +29,16 @@ where
     Ok(())
 }
 
-/// Concatonates the given vector on screen
+/** Concatonates the given vector on screen
+# Variables
+* `conn`: the `X11` Connection
+* `screen`: the screen
+* `window`: the `X11` window id
+* `x`: x coordanite
+* `y`: y coordanite
+* `labels`: strings to concat
+* `font_name`: font
+*/
 pub fn concat_text<C>(
     conn: &C,
     screen: &Screen,
@@ -56,7 +65,7 @@ where
     Ok(())
 }
 /// Draws text and returns the overall width of the box
-pub fn draw_text<C>(
+fn draw_text<C>(
     conn: &C,
     screen: &Screen,
     window: X11Window,

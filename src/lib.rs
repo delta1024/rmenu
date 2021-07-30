@@ -1,36 +1,15 @@
 /*! # Abstract
 rmenu is a one to one rewrite of dmenu in rust for use with redwm with out looking at the dmenu source code.
 # Basic Data Flow
-* Read from stdin into a vector (maybe hashtable)
-* for each line create a assosiated context to be drawn within the bar
-* the prompt is drawn, as the user types the list is narrowed down to matche (use fuzzy sort for this)
-* when the user sellects an option it's string is returned to stdout
+## Done
+* Read from stdin into a vector
+* each line is then concatonated onto the bar.
+## TODO
+* program will grab keyboard input and display button press in prompot window
+* fuzzy search is preformed on user input and checked againsed the piped data
+* highest match is highlighted
+* when the Return Key is pressed the usser selectoin is outputed to stdout
 
-# Main
-```
-use rmenu::prelude::*;
-fn main() {
-    let (conn, screen_num) = x11rb::connect(None).unwrap();
-    let win = conn.generate_id().unwrap();
-    let screen = &conn.setup().roots[screen_num];
-
-    let gc_id = conn.generate_id().unwrap();
-
-    let window = Window::builder(win, &screen);
-
-    let values = CreateGCAux::default().foreground(screen.black_pixel);
-    set_window_properties(&conn, &window, &screen);
-
-    conn.create_gc(gc_id, window.id, &values).unwrap();
-
-    conn.map_window(window.id).unwrap();
-    conn.flush().unwrap();
-    handle_event_loop(&conn, window.id, gc_id).unwrap();
-}
-```
-# Input handeling
-```
-```
 */
 use std::io::{self, BufRead};
 use x11rb::COPY_DEPTH_FROM_PARENT;
@@ -46,7 +25,9 @@ use crate::prelude::*;
 pub mod events;
 pub mod objects;
 
-pub fn get_user_in() -> RmenuResult<Vec<String>> {
+
+/// Returns lines from stdin as  `Vec<String>`.
+pub fn parse_std_in() -> RmenuResult<Vec<String>> {
     let bug: Vec<String> = io::stdin().lock().lines().map(|l| l.unwrap()).collect();
     Ok(bug)
 }

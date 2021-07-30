@@ -1,7 +1,7 @@
 use rmenu::prelude::*;
-use rmenu::get_user_in;
+use rmenu::parse_std_in;
 fn main() {
-    let input = get_user_in().unwrap();
+    let input = parse_std_in().unwrap();
 
     let (conn, screen_num) = x11rb::connect(None).unwrap();
     let win = conn.generate_id().unwrap();
