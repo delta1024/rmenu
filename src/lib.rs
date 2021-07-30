@@ -30,29 +30,34 @@ fn main() {
 ```
 # Input handeling
 ```
-use std::io::{self, BufRead};
-     let stdin = io::stdin();
-     let lines: Vec<String> = stdin
-         .lock()
-         .lines()
-         .map(|n| n.expect("coulnd not read from stdin"))
-         .collect();
-     for i in lines {
-         println!("{}", i);
-     }
 ```
 */
+use std::io::{self, BufRead};
 use x11rb::COPY_DEPTH_FROM_PARENT;
 pub const HEIGHT: u16 = 22;
 // pub const USER_FONT: &str = "-adobe-times-medium-i-normal--8-80-75-75-p-42-iso10646-1";
 pub const USER_FONT: &str = "lucidasanstypewriter-12";
 pub const FONT_SIZE: usize = 12;
+pub const _TEST_VEC: [&str; 2] = ["Hello", "World"];
 const TITLE: &str = "rmenu";
 
 pub mod prelude;
 use crate::prelude::*;
 pub mod events;
 pub mod objects;
+
+pub fn get_user_in() -> RmenuResult<Vec<String>> {
+    let bug: Vec<String> = io::stdin().lock().lines().map(|l| l.unwrap()).collect();
+    Ok(bug)
+}
+
+pub fn get_user_args() -> RmenuResult<Option<Vec<String>>> {
+    Ok(Some(vec![
+        String::from("Not"),
+        String::from("Yet"),
+        String::from("Implemented"),
+    ]))
+}
 
 #[derive(Default)]
 /// Contains the window metadata
@@ -79,7 +84,7 @@ pub struct Window {
 
 impl Window {
     /** builds a empty winow that can then be configured
-    
+
     see [`set_window_properties`] for a full example of how to set up the X connection.
     # Default Values
     * `x`: 0
@@ -87,7 +92,7 @@ impl Window {
     * `border`: 0
     * `width`: screen width in pixels
     * `height`:  [`HEIGHT`]
-    * `class`: [`None`] 
+    * `class`: [`None`]
     * `values`: see [`set_values`]
     */
     pub fn builder(id: X11Window, screen: &Screen) -> Self {
@@ -100,7 +105,6 @@ impl Window {
             ..Default::default()
         }
     }
-
 }
 
 /// sets the application default color sceme and settings

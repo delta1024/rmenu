@@ -1,6 +1,6 @@
 //! X11 Objects
-use crate::FONT_SIZE;
 use crate::prelude::*;
+use crate::FONT_SIZE;
 use crate::HEIGHT;
 use x11rb::rust_connection::ReplyOrIdError;
 pub fn x_in_a_box<C>(conn: &C, win_id: X11Window, gc_id: u32) -> RmenuResult<()>
@@ -29,6 +29,32 @@ where
     Ok(())
 }
 
+/// Concatonates the given vector on screen
+pub fn concat_text<C>(
+    conn: &C,
+    screen: &Screen,
+    window: X11Window,
+    x: i16,
+    y: i16,
+    labels: &Vec<String>,
+    font_name: &str,
+) -> RmenuResult<()>
+where
+    C: Connection + RequestConnection,
+{
+    let mut text = labels.iter();
+    let mut x = x;
+    loop {
+        let label = text.next();
+        let label = match label {
+            Some(string) => string,
+            None => break,
+        };
+
+        x = draw_text(conn, screen, window, x, y, &label, font_name)?;
+    }
+    Ok(())
+}
 /// Draws text and returns the overall width of the box
 pub fn draw_text<C>(
     conn: &C,
@@ -38,7 +64,7 @@ pub fn draw_text<C>(
     y1: i16,
     label: &str,
     font_name: &str,
-) -> RmenuResult<u32>
+) -> RmenuResult<i16>
 where
     C: Connection + RequestConnection,
 {
@@ -46,9 +72,9 @@ where
 
     conn.image_text8(window, gc, x1, y1, label.as_bytes())?;
 
-
     conn.free_gc(gc)?;
-    let len = (label.chars().count() * FONT_SIZE) as u32;
+    let len = (label.chars().count() * FONT_SIZE) as i16;
+    let len = x1 + len;
     Ok(len)
 }
 

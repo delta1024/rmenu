@@ -1,7 +1,7 @@
 //! general use imports
 pub use crate::events::handle_event_loop;
-pub use crate::Window;
 pub use crate::set_window_properties;
+pub use crate::Window;
 pub use std::error::Error;
 pub use x11rb::connection::Connection;
 pub use x11rb::connection::RequestConnection;
