@@ -3,10 +3,12 @@ use crate::prelude::*;
 use crate::FONT_SIZE;
 use crate::HEIGHT;
 /// Holds information about text location and context
-#[derive(Debug, Clone, Default, Copy)]
+#[derive(Debug, Clone, Default, Copy, PartialOrd, PartialEq)]
 pub struct TextBox<'a> {
-    text: &'a str,
-    x1: i16,
+    /// [`TextBox`] text
+    pub text: &'a str,
+    /// The start point for the textbox
+    pub x1: i16,
     /// The end point for the text box
     pub x2: i16,
     y: i16,

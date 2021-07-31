@@ -81,15 +81,11 @@ impl Window {
 }
 
 /// sets the application default color sceme and settings
-/// # Values
-/// * `background_pixel(screen.black_pixel)`
-/// * `override_redirect(1)`
-/// * `event_mask(Event::Mask::EXPOSURE)`
 pub fn set_values(screen: &Screen) -> CreateWindowAux {
     CreateWindowAux::default()
         .background_pixel(screen.white_pixel)
         .override_redirect(1)
-        .event_mask(EventMask::EXPOSURE)
+        .event_mask(EventMask::EXPOSURE | EventMask::BUTTON_PRESS | EventMask::KEY_RELEASE)
 }
 
 /** Sets the window properties (see [`Window`] for more configuration options)

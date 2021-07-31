@@ -1,7 +1,8 @@
 //! Event Handling
-use crate::objects;
 use crate::concat_text;
+use crate::objects;
 use crate::prelude::*;
+// use crate::HEIGHT;
 pub fn handle_event_loop<C>(
     conn: &C,
     win_id: u32,
@@ -22,6 +23,16 @@ where
                     conn.flush()?;
                 }
             }
+
+            Event::ButtonPress(event) => {
+                for i in &input {
+                    if (event.event_x >= i.x1) && (event.event_x <= i.x2) {
+                        println!("{}", i.text);
+                        std::process::exit(0);
+                    }
+                }
+            }
+
             Event::Error(_) => eprintln!("Got an unexpected error"),
             _ => eprintln!("Got an unknown event"),
         }

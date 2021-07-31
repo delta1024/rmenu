@@ -25,7 +25,6 @@ fn main() {
     conn.create_gc(gc_id, window.id, &values).unwrap();
 
     conn.map_window(window.id).unwrap();
-    conn.flush().unwrap();
 
     {
         let mut x = 24;
@@ -39,5 +38,6 @@ fn main() {
         }
     }
 
+    conn.flush().unwrap();
     handle_event_loop(&conn, window.id, gc_id, input).unwrap();
 }
